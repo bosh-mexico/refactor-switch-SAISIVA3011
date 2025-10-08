@@ -1,13 +1,9 @@
 #include <gtest/gtest.h>
 #include "PaymentProcessor.hpp"
-#include "PayPalStrategy.hpp"
-#include "GooglePayStrategy.hpp"
-#include "CreditCardStrategy.hpp"
-
-// Helper function to check if string contains substring
-bool ContainsSubstring(const std::string& str, const std::string& substr) {
-    return str.find(substr) != std::string::npos;
-}
+#include "strategies/PayPalStrategy.hpp"
+#include "strategies/GooglePayStrategy.hpp"
+#include "strategies/CreditCardStrategy.hpp"
+#include "TestUtils.hpp"
 
 // Test Fixture for PaymentProcessor
 class PaymentProcessorTest : public ::testing::Test {
