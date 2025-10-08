@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include "PayPalStrategy.hpp"
 #include "GooglePayStrategy.hpp"
 #include "CreditCardStrategy.hpp"
 
-using ::testing::HasSubstr;
+// Helper function to check if string contains substring
+bool ContainsSubstring(const std::string& str, const std::string& substr) {
+    return str.find(substr) != std::string::npos;
+}
 
 // ========== PayPalStrategy Tests ==========
 
@@ -12,8 +14,8 @@ TEST(PayPalStrategyTest, FormatMessageCorrectly) {
     PayPalStrategy strategy;
     std::string result = strategy.processPayment(100.50);
     
-    EXPECT_THAT(result, HasSubstr("PayPal"));
-    EXPECT_THAT(result, HasSubstr("$100.50"));
+    EXPECT_TRUE(ContainsSubstring(result, "PayPal"));
+    EXPECT_TRUE(ContainsSubstring(result, "$100.50"));
 }
 
 TEST(PayPalStrategyTest, ReturnCorrectPaymentType) {
@@ -40,10 +42,10 @@ TEST(PayPalStrategyTest, AcceptNormalAmounts) {
 TEST(PayPalStrategyTest, FormatVariousAmountsCorrectly) {
     PayPalStrategy strategy;
     
-    EXPECT_THAT(strategy.processPayment(0.01), HasSubstr("$0.01"));
-    EXPECT_THAT(strategy.processPayment(1.00), HasSubstr("$1.00"));
-    EXPECT_THAT(strategy.processPayment(99.99), HasSubstr("$99.99"));
-    EXPECT_THAT(strategy.processPayment(1234.56), HasSubstr("$1234.56"));
+    EXPECT_TRUE(ContainsSubstring(strategy.processPayment(0.01), "$0.01"));
+    EXPECT_TRUE(ContainsSubstring(strategy.processPayment(1.00), "$1.00"));
+    EXPECT_TRUE(ContainsSubstring(strategy.processPayment(99.99), "$99.99"));
+    EXPECT_TRUE(ContainsSubstring(strategy.processPayment(1234.56), "$1234.56"));
 }
 
 // ========== GooglePayStrategy Tests ==========
@@ -52,8 +54,8 @@ TEST(GooglePayStrategyTest, FormatMessageCorrectly) {
     GooglePayStrategy strategy;
     std::string result = strategy.processPayment(75.25);
     
-    EXPECT_THAT(result, HasSubstr("Google Pay"));
-    EXPECT_THAT(result, HasSubstr("$75.25"));
+    EXPECT_TRUE(ContainsSubstring(result, "Google Pay"));
+    EXPECT_TRUE(ContainsSubstring(result, "$75.25"));
 }
 
 TEST(GooglePayStrategyTest, ReturnCorrectPaymentType) {
@@ -72,9 +74,9 @@ TEST(GooglePayStrategyTest, UseDefaultValidation) {
 TEST(GooglePayStrategyTest, FormatVariousAmountsCorrectly) {
     GooglePayStrategy strategy;
     
-    EXPECT_THAT(strategy.processPayment(0.50), HasSubstr("$0.50"));
-    EXPECT_THAT(strategy.processPayment(50.00), HasSubstr("$50.00"));
-    EXPECT_THAT(strategy.processPayment(999.99), HasSubstr("$999.99"));
+    EXPECT_TRUE(ContainsSubstring(strategy.processPayment(0.50), "$0.50"));
+    EXPECT_TRUE(ContainsSubstring(strategy.processPayment(50.00), "$50.00"));
+    EXPECT_TRUE(ContainsSubstring(strategy.processPayment(999.99), "$999.99"));
 }
 
 // ========== CreditCardStrategy Tests ==========
@@ -83,8 +85,8 @@ TEST(CreditCardStrategyTest, FormatMessageCorrectly) {
     CreditCardStrategy strategy;
     std::string result = strategy.processPayment(500.00);
     
-    EXPECT_THAT(result, HasSubstr("Credit Card"));
-    EXPECT_THAT(result, HasSubstr("$500.00"));
+    EXPECT_TRUE(ContainsSubstring(result, "Credit Card"));
+    EXPECT_TRUE(ContainsSubstring(result, "$500.00"));
 }
 
 TEST(CreditCardStrategyTest, ReturnCorrectPaymentType) {
@@ -118,9 +120,9 @@ TEST(CreditCardStrategyTest, RejectBoundaryViolations) {
 TEST(CreditCardStrategyTest, FormatVariousAmountsCorrectly) {
     CreditCardStrategy strategy;
     
-    EXPECT_THAT(strategy.processPayment(100.00), HasSubstr("$100.00"));
-    EXPECT_THAT(strategy.processPayment(5000.00), HasSubstr("$5000.00"));
-    EXPECT_THAT(strategy.processPayment(9999.99), HasSubstr("$9999.99"));
+    EXPECT_TRUE(ContainsSubstring(strategy.processPayment(100.00), "$100.00"));
+    EXPECT_TRUE(ContainsSubstring(strategy.processPayment(5000.00), "$5000.00"));
+    EXPECT_TRUE(ContainsSubstring(strategy.processPayment(9999.99), "$9999.99"));
 }
 
 // ========== Polymorphism Tests ==========
@@ -136,7 +138,7 @@ TEST(StrategyPolymorphismTest, AllStrategiesWorkThroughBasePointer) {
         EXPECT_FALSE(strategy->getPaymentType().empty());
         EXPECT_TRUE(strategy->isValidAmount(100.0));
         std::string result = strategy->processPayment(100.0);
-        EXPECT_THAT(result, HasSubstr("Processing payment"));
+        EXPECT_TRUE(ContainsSubstring(result, "Processing payment"));
     }
 }
 
@@ -158,8 +160,8 @@ TEST(StrategyPolymorphismTest, StrategiesMaintainIndependentState) {
     std::string result1 = strategy1->processPayment(50.0);
     std::string result2 = strategy2->processPayment(100.0);
     
-    EXPECT_THAT(result1, HasSubstr("$50.00"));
-    EXPECT_THAT(result2, HasSubstr("$100.00"));
+    EXPECT_TRUE(ContainsSubstring(result1, "$50.00"));
+    EXPECT_TRUE(ContainsSubstring(result2, "$100.00"));
 }
 
 TEST(StrategyInterfaceTest, AllStrategiesImplementRequiredMethods) {
