@@ -1,4 +1,4 @@
-#include "strategies/PayPalStrategy.hpp"
+#include "PayPalStrategy.hpp"
 #include <sstream>
 #include <iomanip>
 
