@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include "PaymentProcessor.hpp"
-#include "strategies/PayPalStrategy.hpp"
-#include "strategies/GooglePayStrategy.hpp"
-#include "strategies/CreditCardStrategy.hpp"
+#include "PayPalStrategy.hpp"
+#include "GooglePayStrategy.hpp"
+#include "CreditCardStrategy.hpp"
 #include "TestUtils.hpp"
 
 // Test Fixture for PaymentProcessor
