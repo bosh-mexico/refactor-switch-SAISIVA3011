@@ -47,7 +47,7 @@ public:
      * @param paymentMode The payment method to use
      * @param amount The payment amount
      * @return ProcessingResult with success status and message
-     * Complexity: 1 (delegates all validation to helper methods)
+     * Complexity: 3 (amount check + strategy check + delegate)
      */
     ProcessingResult checkout(const std::string& paymentMode, double amount);
     
@@ -65,8 +65,9 @@ private:
     // Validation helpers - Complexity: 1 each
     bool isAmountPositive(double amount) const;
     bool hasRegisteredStrategy(const std::string& mode) const;
-    bool isAmountValidForStrategy(const std::shared_ptr<PaymentStrategy>& strategy, 
-                                  double amount) const;
+    
+    // Processing helper - Complexity: 2 (validation + processing)
+    ProcessingResult processStrategyPayment(const std::string& paymentMode, double amount);
     
     // Result creation helpers - Complexity: 1 each
     ProcessingResult createErrorResult(const std::string& error) const;
