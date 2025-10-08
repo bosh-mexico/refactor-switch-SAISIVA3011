@@ -2,18 +2,19 @@
 #include <sstream>
 #include <iomanip>
 
+// Complexity: 1 (simple string formatting)
 std::string GooglePayStrategy::processPayment(double amount) const {
-    std::ostringstream oss;
-    oss << "Processing payment via Google Pay for " << formatAmount(amount) << ".";
+    return "Processing payment via Google Pay for " + formatAmount(amount) + ".";
     // Placeholder: Integrate Google Pay API
     // Example: PaymentDataRequest request; gpay.loadPaymentData(request);
-    return oss.str();
 }
 
+// Complexity: 1 (return constant)
 std::string GooglePayStrategy::getPaymentType() const {
     return "GooglePay";
 }
 
+// Complexity: 1 (string formatting only)
 std::string GooglePayStrategy::formatAmount(double amount) const {
     std::ostringstream oss;
     oss << "$" << std::fixed << std::setprecision(2) << amount;
