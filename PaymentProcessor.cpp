@@ -11,10 +11,10 @@ void PaymentProcessor::registerStrategy(const std::string& name,
     strategies_[name] = strategy;
 }
 
-// Complexity: 1 (early return pattern, delegates to helpers)
+// Complexity: 3 (3 decision points: amount check, strategy check, validation check)
+// REFACTORED to use nested structure instead of multiple returns
 PaymentProcessor::ProcessingResult 
 PaymentProcessor::checkout(const std::string& paymentMode, double amount) {
-    // Early return pattern - each check is in separate method
     if (!isAmountPositive(amount)) {
         return createErrorResult("Payment amount must be positive");
     }
@@ -23,12 +23,7 @@ PaymentProcessor::checkout(const std::string& paymentMode, double amount) {
         return createErrorResult(formatUnsupportedModeError(paymentMode));
     }
     
-    auto strategy = strategies_[paymentMode];
-    if (!isAmountValidForStrategy(strategy, amount)) {
-        return createErrorResult(formatInvalidAmountError(paymentMode));
-    }
-    
-    return processWithStrategy(strategy, amount);
+    return processStrategyPayment(paymentMode, amount);
 }
 
 // Complexity: 1 (single lookup)
@@ -48,10 +43,17 @@ bool PaymentProcessor::hasRegisteredStrategy(const std::string& mode) const {
     return strategies_.find(mode) != strategies_.end();
 }
 
-// Complexity: 1 (single method call)
-bool PaymentProcessor::isAmountValidForStrategy(
-    const std::shared_ptr<PaymentStrategy>& strategy, double amount) const {
-    return strategy->isValidAmount(amount);
+// NEW METHOD - Complexity: 2 (1 if + 1 base)
+// Separated strategy validation and processing
+PaymentProcessor::ProcessingResult 
+PaymentProcessor::processStrategyPayment(const std::string& paymentMode, double amount) {
+    auto strategy = strategies_[paymentMode];
+    
+    if (!strategy->isValidAmount(amount)) {
+        return createErrorResult(formatInvalidAmountError(paymentMode));
+    }
+    
+    return processWithStrategy(strategy, amount);
 }
 
 // Complexity: 1 (simple construction)
