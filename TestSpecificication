@@ -1,0 +1,489 @@
+================================================================================
+                    UNIT TEST CASES SPECIFICATION
+                    Payment Processing System
+================================================================================
+
+Project: Payment System with Strategy Pattern
+Date: October 8, 2025
+Framework: GoogleTest
+Total Test Cases: 40
+
+================================================================================
+PAYMENTPROCESSOR TESTS
+================================================================================
+
+Test Case 1
+------------------------
+Register Valid Strategy -> Strategy is registered successfully
+Input: PayPalStrategy instance with name "PayPal"
+Expected Output: 
+  - No exception thrown
+  - hasStrategy("PayPal") returns true
+
+************************
+
+Test Case 2
+------------------------
+Register Null Strategy -> Throws exception
+Input: nullptr strategy with name "Invalid"
+Expected Output: 
+  - std::invalid_argument exception thrown
+  - Exception message: "Cannot register null strategy"
+
+************************
+
+Test Case 3
+------------------------
+Strategy Not Registered Initially -> hasStrategy returns false
+Input: Check for "PayPal" without registration
+Expected Output: 
+  - hasStrategy("PayPal") returns false
+
+************************
+
+Test Case 4
+------------------------
+Register Multiple Strategies -> All strategies registered
+Input: 
+  - Register PayPalStrategy as "PayPal"
+  - Register GooglePayStrategy as "GooglePay"
+  - Register CreditCardStrategy as "CreditCard"
+Expected Output:
+  - hasStrategy("PayPal") returns true
+  - hasStrategy("GooglePay") returns true
+  - hasStrategy("CreditCard") returns true
+
+************************
+
+Test Case 5
+------------------------
+Override Existing Strategy -> Strategy is replaced
+Input: 
+  - Register PayPalStrategy as "PayPal"
+  - Register another PayPalStrategy as "PayPal"
+Expected Output:
+  - No exception thrown
+  - hasStrategy("PayPal") returns true after both registrations
+
+************************
+
+Test Case 6
+------------------------
+Reject Negative Amount -> Payment fails with error message
+Input: checkout("PayPal", -10.0)
+Expected Output:
+  - result.success = false
+  - result.message contains "positive"
+
+************************
+
+Test Case 7
+------------------------
+Reject Zero Amount -> Payment fails with error message
+Input: checkout("PayPal", 0.0)
+Expected Output:
+  - result.success = false
+  - result.message contains "positive"
+
+************************
+
+Test Case 8
+------------------------
+Accept Valid Positive Amount -> Payment succeeds
+Input: checkout("PayPal", 100.50)
+Expected Output:
+  - result.success = true
+  - result.message contains "PayPal"
+  - result.message contains "100.50"
+
+************************
+
+Test Case 9
+------------------------
+Accept Small Valid Amount -> Payment succeeds (boundary test)
+Input: checkout("PayPal", 0.01)
+Expected Output:
+  - result.success = true
+
+************************
+
+Test Case 10
+------------------------
+Accept Large Valid Amount -> Payment succeeds (boundary test)
+Input: checkout("PayPal", 9999.99)
+Expected Output:
+  - result.success = true
+
+************************
+
+Test Case 11
+------------------------
+Handle Unknown Payment Mode -> Error with unsupported mode
+Input: checkout("Bitcoin", 50.0)
+Expected Output:
+  - result.success = false
+  - result.message contains "Unsupported"
+  - result.message contains "Bitcoin"
+
+************************
+
+Test Case 12
+------------------------
+Case Sensitive Payment Mode Names -> Lowercase fails
+Input: checkout("paypal", 50.0)  [Note: registered as "PayPal"]
+Expected Output:
+  - result.success = false
+  - result.message contains "Unsupported"
+
+************************
+
+Test Case 13
+------------------------
+Empty Payment Mode -> Payment fails
+Input: checkout("", 50.0)
+Expected Output:
+  - result.success = false
+  - result.message contains error
+
+************************
+
+Test Case 14
+------------------------
+Process PayPal Payment -> Successful PayPal transaction
+Input: checkout("PayPal", 100.00)
+Expected Output:
+  - result.success = true
+  - result.message contains "PayPal"
+
+************************
+
+Test Case 15
+------------------------
+Process Google Pay Payment -> Successful GooglePay transaction
+Input: checkout("GooglePay", 75.50)
+Expected Output:
+  - result.success = true
+  - result.message contains "Google Pay"
+
+************************
+
+Test Case 16
+------------------------
+Process Credit Card Payment -> Successful CreditCard transaction
+Input: checkout("CreditCard", 200.00)
+Expected Output:
+  - result.success = true
+  - result.message contains "Credit Card"
+
+************************
+
+Test Case 17
+------------------------
+Multiple Sequential Transactions -> All transactions succeed
+Input: 
+  - checkout("PayPal", 50.0)
+  - checkout("GooglePay", 75.0)
+  - checkout("CreditCard", 100.0)
+Expected Output:
+  - All three results have success = true
+
+************************
+
+Test Case 18
+------------------------
+PayPal Minimum Amount Validation -> Below minimum fails
+Input: checkout("PayPal", 0.001)  [PayPal min = $0.01]
+Expected Output:
+  - result.success = false
+  - result.message contains "Invalid amount"
+
+************************
+
+Test Case 19
+------------------------
+Credit Card Maximum Amount Validation -> Above maximum fails
+Input: checkout("CreditCard", 10000.01)  [CreditCard max = $10,000]
+Expected Output:
+  - result.success = false
+  - result.message contains "Invalid amount"
+
+************************
+
+Test Case 20
+------------------------
+Credit Card At Maximum Limit -> Exactly at limit succeeds
+Input: checkout("CreditCard", 10000.00)
+Expected Output:
+  - result.success = true
+
+
+================================================================================
+PAYPAL STRATEGY TESTS
+================================================================================
+
+Test Case 21
+------------------------
+Format PayPal Message Correctly -> Message contains payment details
+Input: processPayment(100.50)
+Expected Output:
+  - Result contains "PayPal"
+  - Result contains "$100.50"
+
+************************
+
+Test Case 22
+------------------------
+Return Correct Payment Type -> Returns "PayPal"
+Input: getPaymentType()
+Expected Output: "PayPal"
+
+************************
+
+Test Case 23
+------------------------
+Validate Minimum Amount -> $0.01 passes, below fails
+Input: 
+  - isValidAmount(0.01)
+  - isValidAmount(0.001)
+  - isValidAmount(0.009)
+Expected Output:
+  - 0.01 returns true
+  - 0.001 returns false
+  - 0.009 returns false
+
+************************
+
+Test Case 24
+------------------------
+Accept Normal Amounts -> All normal amounts pass validation
+Input:
+  - isValidAmount(1.0)
+  - isValidAmount(100.0)
+  - isValidAmount(9999.99)
+Expected Output:
+  - All return true
+
+************************
+
+Test Case 25
+------------------------
+Format Various Amounts Correctly -> Currency formatting is correct
+Input:
+  - processPayment(0.01)
+  - processPayment(1.00)
+  - processPayment(99.99)
+  - processPayment(1234.56)
+Expected Output:
+  - Contains "$0.01"
+  - Contains "$1.00"
+  - Contains "$99.99"
+  - Contains "$1234.56"
+
+
+================================================================================
+GOOGLE PAY STRATEGY TESTS
+================================================================================
+
+Test Case 26
+------------------------
+Format Google Pay Message Correctly -> Message contains payment details
+Input: processPayment(75.25)
+Expected Output:
+  - Result contains "Google Pay"
+  - Result contains "$75.25"
+
+************************
+
+Test Case 27
+------------------------
+Return Correct Payment Type -> Returns "GooglePay"
+Input: getPaymentType()
+Expected Output: "GooglePay"
+
+************************
+
+Test Case 28
+------------------------
+Use Default Validation -> Accepts all positive amounts
+Input:
+  - isValidAmount(0.01)
+  - isValidAmount(100.0)
+  - isValidAmount(10000.0)
+Expected Output:
+  - All return true
+
+************************
+
+Test Case 29
+------------------------
+Format Various Amounts Correctly -> Currency formatting is correct
+Input:
+  - processPayment(0.50)
+  - processPayment(50.00)
+  - processPayment(999.99)
+Expected Output:
+  - Contains "$0.50"
+  - Contains "$50.00"
+  - Contains "$999.99"
+
+
+================================================================================
+CREDIT CARD STRATEGY TESTS
+================================================================================
+
+Test Case 30
+------------------------
+Format Credit Card Message Correctly -> Message contains payment details
+Input: processPayment(500.00)
+Expected Output:
+  - Result contains "Credit Card"
+  - Result contains "$500.00"
+
+************************
+
+Test Case 31
+------------------------
+Return Correct Payment Type -> Returns "CreditCard"
+Input: getPaymentType()
+Expected Output: "CreditCard"
+
+************************
+
+Test Case 32
+------------------------
+Validate Maximum Transaction Limit -> $10,000 passes, above fails
+Input:
+  - isValidAmount(10000.00)
+  - isValidAmount(10000.01)
+  - isValidAmount(15000.00)
+Expected Output:
+  - 10000.00 returns true
+  - 10000.01 returns false
+  - 15000.00 returns false
+
+************************
+
+Test Case 33
+------------------------
+Accept Amounts Within Limit -> All amounts within limit pass
+Input:
+  - isValidAmount(0.01)
+  - isValidAmount(5000.00)
+  - isValidAmount(9999.99)
+Expected Output:
+  - All return true
+
+************************
+
+Test Case 34
+------------------------
+Reject Boundary Violations -> Amounts above limit fail
+Input:
+  - isValidAmount(10001.00)
+  - isValidAmount(20000.00)
+Expected Output:
+  - Both return false
+
+************************
+
+Test Case 35
+------------------------
+Format Various Amounts Correctly -> Currency formatting is correct
+Input:
+  - processPayment(100.00)
+  - processPayment(5000.00)
+  - processPayment(9999.99)
+Expected Output:
+  - Contains "$100.00"
+  - Contains "$5000.00"
+  - Contains "$9999.99"
+
+
+================================================================================
+POLYMORPHISM TESTS
+================================================================================
+
+Test Case 36
+------------------------
+All Strategies Work Through Base Pointer -> Polymorphism works correctly
+Input: Array of PaymentStrategy base pointers to all 3 strategies
+Expected Output:
+  - All getPaymentType() return non-empty strings
+  - All isValidAmount(100.0) return true
+  - All processPayment(100.0) return message containing "Processing payment"
+
+************************
+
+Test Case 37
+------------------------
+Each Strategy Has Unique Payment Type -> Type identifiers are unique
+Input: Get payment types from all three strategies
+Expected Output:
+  - PayPal type != GooglePay type
+  - GooglePay type != CreditCard type
+  - CreditCard type != PayPal type
+
+************************
+
+Test Case 38
+------------------------
+Strategies Maintain Independent State -> No state interference
+Input:
+  - Create two PayPalStrategy instances
+  - strategy1.processPayment(50.0)
+  - strategy2.processPayment(100.0)
+Expected Output:
+  - result1 contains "$50.00"
+  - result2 contains "$100.00"
+
+************************
+
+Test Case 39
+------------------------
+All Strategies Implement Required Methods -> Interface compliance
+Input: Call all interface methods on all strategies
+Expected Output:
+  - processPayment(100.0) - No exceptions from any strategy
+  - getPaymentType() - No exceptions from any strategy
+  - isValidAmount(100.0) - No exceptions from any strategy
+
+
+================================================================================
+CYCLOMATIC COMPLEXITY VALIDATION
+================================================================================
+
+Test Case 40
+------------------------
+Verify All Functions Have Complexity ≤ 3 -> Code quality maintained
+Input: Run lizard complexity analysis
+Expected Output:
+  - PaymentProcessor::checkout() CC = 3
+  - PaymentProcessor::registerStrategy() CC = 2
+  - PaymentProcessor::processStrategyPayment() CC = 2
+  - All other functions CC = 1
+  - Average CC = 1.45
+  - Maximum CC = 3
+  - No function exceeds CC = 3
+
+
+================================================================================
+SUMMARY
+================================================================================
+
+Total Test Cases: 40
+- Registration Tests: 5
+- Validation Tests: 10
+- Error Handling: 5
+- Integration Tests: 5
+- PayPal Strategy: 5
+- GooglePay Strategy: 4
+- CreditCard Strategy: 6
+- Polymorphism: 4
+- Complexity: 1
+
+Coverage Target: 95%+ line coverage, 100% branch coverage
+All functions maintain Cyclomatic Complexity ≤ 3
+
+================================================================================
+END OF TEST CASES
+================================================================================
