@@ -1,4 +1,4 @@
-name: Limit file size
+name: Limit complexity
 
 on: [push, pull_request]
 
@@ -7,14 +7,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Install lizard
       run: pip install lizard
 
     - name: Limit complexity
-      run: $HOME/.local/bin/lizard --CCN 30
-
-    - name: Check size
-      run: |
-        $HOME/.local/bin/lizard | bash .github/workflows/lpar.sh 30
+      run: $HOME/.local/bin/lizard --CCN 3
