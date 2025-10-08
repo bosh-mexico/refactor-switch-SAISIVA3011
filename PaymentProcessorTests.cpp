@@ -1,11 +1,13 @@
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include "PaymentProcessor.hpp"
 #include "PayPalStrategy.hpp"
 #include "GooglePayStrategy.hpp"
 #include "CreditCardStrategy.hpp"
 
-using ::testing::HasSubstr;
+// Helper function to check if string contains substring
+bool ContainsSubstring(const std::string& str, const std::string& substr) {
+    return str.find(substr) != std::string::npos;
+}
 
 // Test Fixture for PaymentProcessor
 class PaymentProcessorTest : public ::testing::Test {
@@ -58,7 +60,7 @@ TEST_F(PaymentProcessorTest, RejectNegativeAmount) {
     auto result = processor.checkout("PayPal", -10.0);
     
     EXPECT_FALSE(result.success);
-    EXPECT_THAT(result.message, HasSubstr("positive"));
+    EXPECT_TRUE(ContainsSubstring(result.message, "positive"));
 }
 
 TEST_F(PaymentProcessorTest, RejectZeroAmount) {
@@ -66,7 +68,7 @@ TEST_F(PaymentProcessorTest, RejectZeroAmount) {
     auto result = processor.checkout("PayPal", 0.0);
     
     EXPECT_FALSE(result.success);
-    EXPECT_THAT(result.message, HasSubstr("positive"));
+    EXPECT_TRUE(ContainsSubstring(result.message, "positive"));
 }
 
 TEST_F(PaymentProcessorTest, AcceptValidPositiveAmount) {
@@ -74,8 +76,8 @@ TEST_F(PaymentProcessorTest, AcceptValidPositiveAmount) {
     auto result = processor.checkout("PayPal", 100.50);
     
     EXPECT_TRUE(result.success);
-    EXPECT_THAT(result.message, HasSubstr("PayPal"));
-    EXPECT_THAT(result.message, HasSubstr("100.50"));
+    EXPECT_TRUE(ContainsSubstring(result.message, "PayPal"));
+    EXPECT_TRUE(ContainsSubstring(result.message, "100.50"));
 }
 
 TEST_F(PaymentProcessorTest, AcceptSmallValidAmount) {
@@ -99,8 +101,8 @@ TEST_F(PaymentProcessorTest, HandleUnknownPaymentModeGracefully) {
     auto result = processor.checkout("Bitcoin", 50.0);
     
     EXPECT_FALSE(result.success);
-    EXPECT_THAT(result.message, HasSubstr("Unsupported"));
-    EXPECT_THAT(result.message, HasSubstr("Bitcoin"));
+    EXPECT_TRUE(ContainsSubstring(result.message, "Unsupported"));
+    EXPECT_TRUE(ContainsSubstring(result.message, "Bitcoin"));
 }
 
 TEST_F(PaymentProcessorTest, CaseSensitivePaymentModeNames) {
@@ -108,7 +110,7 @@ TEST_F(PaymentProcessorTest, CaseSensitivePaymentModeNames) {
     auto result = processor.checkout("paypal", 50.0);  // lowercase
     
     EXPECT_FALSE(result.success);
-    EXPECT_THAT(result.message, HasSubstr("Unsupported"));
+    EXPECT_TRUE(ContainsSubstring(result.message, "Unsupported"));
 }
 
 TEST_F(PaymentProcessorTest, EmptyPaymentMode) {
@@ -127,7 +129,7 @@ TEST_F(PaymentProcessorTest, ProcessPayPalPayment) {
     
     auto result = processor.checkout("PayPal", 100.00);
     EXPECT_TRUE(result.success);
-    EXPECT_THAT(result.message, HasSubstr("PayPal"));
+    EXPECT_TRUE(ContainsSubstring(result.message, "PayPal"));
 }
 
 TEST_F(PaymentProcessorTest, ProcessGooglePayPayment) {
@@ -137,7 +139,7 @@ TEST_F(PaymentProcessorTest, ProcessGooglePayPayment) {
     
     auto result = processor.checkout("GooglePay", 75.50);
     EXPECT_TRUE(result.success);
-    EXPECT_THAT(result.message, HasSubstr("Google Pay"));
+    EXPECT_TRUE(ContainsSubstring(result.message, "Google Pay"));
 }
 
 TEST_F(PaymentProcessorTest, ProcessCreditCardPayment) {
@@ -147,7 +149,7 @@ TEST_F(PaymentProcessorTest, ProcessCreditCardPayment) {
     
     auto result = processor.checkout("CreditCard", 200.00);
     EXPECT_TRUE(result.success);
-    EXPECT_THAT(result.message, HasSubstr("Credit Card"));
+    EXPECT_TRUE(ContainsSubstring(result.message, "Credit Card"));
 }
 
 TEST_F(PaymentProcessorTest, MultipleSequentialTransactions) {
@@ -172,7 +174,7 @@ TEST_F(PaymentProcessorTest, PayPalMinimumAmountValidation) {
     
     auto result = processor.checkout("PayPal", 0.001);
     EXPECT_FALSE(result.success);
-    EXPECT_THAT(result.message, HasSubstr("Invalid amount"));
+    EXPECT_TRUE(ContainsSubstring(result.message, "Invalid amount"));
 }
 
 TEST_F(PaymentProcessorTest, CreditCardMaximumAmountValidation) {
@@ -181,7 +183,7 @@ TEST_F(PaymentProcessorTest, CreditCardMaximumAmountValidation) {
     
     auto result = processor.checkout("CreditCard", 10000.01);
     EXPECT_FALSE(result.success);
-    EXPECT_THAT(result.message, HasSubstr("Invalid amount"));
+    EXPECT_TRUE(ContainsSubstring(result.message, "Invalid amount"));
 }
 
 TEST_F(PaymentProcessorTest, CreditCardAtMaximumLimitSucceeds) {
