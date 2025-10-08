@@ -1,4 +1,4 @@
-#include "strategies/GooglePayStrategy.hpp"
+#include "GooglePayStrategy.hpp"
 #include <sstream>
 #include <iomanip>
 
