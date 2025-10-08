@@ -2,11 +2,7 @@
 #include "PayPalStrategy.hpp"
 #include "GooglePayStrategy.hpp"
 #include "CreditCardStrategy.hpp"
-
-// Helper function to check if string contains substring
-bool ContainsSubstring(const std::string& str, const std::string& substr) {
-    return str.find(substr) != std::string::npos;
-}
+#include "TestUtils.hpp"
 
 // ========== PayPalStrategy Tests ==========
 
